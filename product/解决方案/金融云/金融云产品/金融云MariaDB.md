@@ -1,5 +1,5 @@
 ## 简介
-金融级云数据库 TencentDB for MariaDB 是一个适用于 OLTP 场景且兼容 MySQL 5.5、5.6的关系型数据库，它结合了高端商用数据库的可用性和可靠性，同时还具有开源数据库的简单性和性价比，现有 MySQL 应用程序和工具无需修改即可迁移到 TencentDB for MariaDB 中运行。
+金融级云数据库 MariaDB 是一个适用于 OLTP 场景且兼容 MySQL 5.5、5.6的关系型数据库，它结合了高端商用数据库的可用性和可靠性，同时还具有开源数据库的简单性和性价比，现有 MySQL 应用程序和工具无需修改即可迁移到 MariaDB 中运行。
 
 ### 单机集群架构
 ![](https://main.qcloudimg.com/raw/622c3872cfbe382bdef51417fa0ff950.png)
@@ -14,4 +14,4 @@
 - 异地容灾数据库节点组部署在主节点100km以外的异地机房，异地机房处于实时运行状态，且至少拥有主节点50%的性能。
 
 ## 详细了解
-[金融云 MariaDB](http://cloud.tencent.com/product/tdsql.html)
+[金融云 MariaDB](http://cloud.tencent.com/product/tdsql)

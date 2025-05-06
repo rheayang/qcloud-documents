@@ -1,57 +1,50 @@
-## 集成 SDK
-
-本文主要介绍如何快速的将腾讯云 TEduBoard SDK 集成到您的项目中。
+本文主要介绍如何快速的将腾讯云 TEduBoard SDK 集成到您的项目中。如果您使用互动课堂方案，请前往 [互动课堂集成](https://github.com/tencentyun/TIC/blob/master/Android/%E6%8E%A5%E5%85%A5%E6%96%87%E6%A1%A3.md)。
 
 ## 开发环境
 
 - Android Studio 2.0+
-- Android 4.2 （SDK API 17）及以上系统
-
+- Android 4.2（SDK API 17）及以上系统
 
 ## 集成 TEduBoard SDK
 
-您可以选择使用 Gradle 自动加载的方式，或者手动下载 aar 再将其导入到您当前的工程项目中。由于TEduBoard SDK 内部使用 TIMSDK 作为内部信令通道，您还需自动或手动添加 TIMSDK 依赖项。
+您可以选择使用 Gradle 自动加载的方式，或者手动下载 aar 再将其导入到您当前的工程项目中。由于 TEduBoard SDK  内部使用 TIMSDK 作为内部信令通道，您还需自动或手动添加 TIMSDK 依赖项。
 
 
 
 ### 自动加载（aar）
 
-TEduBoard SDK 和 TIMSDK 已经发布到 jcenter 库，您可以通过配置 gradle 自动下载更新。
-
+TEduBoard SDK 和 TIMSDK 已经发布到 Maven Central 库，您可以通过配置 gradle 自动下载更新。
 ![](https://main.qcloudimg.com/raw/13352150cb8bb0a729c28500a05c338f.png)
 
 #### 1. 添加 SDK 依赖
 
 ```java
 dependencies {
-    implementation 'com.tencent.teduboard:TEduBoardSdk:latest.release'
+    implementation 'com.tencent.edu:TEduBoardSdk:latest.release'
     implementation 'com.tencent.imsdk:imsdk:latest.release'
 }
 ```
 
 #### 2. 同步 SDK
 
-单击 Sync Now 按钮，如果您的网络连接 jcenter 没有问题，很快 SDK 就会自动下载集成到工程里。
+单击 Sync Now，如果您的网络连接 Maven Central 没有问题，SDK 会自动下载集成到工程里。
 
 ### 手动下载（aar）
 
-如果您的网络连接 jcenter 有问题，也可以手动下载 SDK 集成到工程里.
+如果您的网络连接 Maven Central 有问题，也可以手动下载 SDK 集成到工程里。
 
 #### 1. 下载 SDK
 
-单击下载最新版 [TEduBaord SDK](https://tic-res-1259648581.cos.ap-shanghai.myqcloud.com/sdk/Android.zip)。前往 [即时通讯官网](https://cloud.tencent.com/document/product/269/36887) 下载 TIMSDK。
-
+单击下载最新版 [TEduBaord SDK](https://cloud.tencent.com/document/product/1137/43150) 。前往 [即时通信 IM](https://cloud.tencent.com/document/product/269/36887) 下载 TIMSDK。
 
 #### 2. 导入 SDK
 
 将下载到的 aar 文件拷贝到工程的 app/libs 目录下。
-
 ![](https://main.qcloudimg.com/raw/904930451506c7a4339db9da55207908.jpg)
 
 #### 3. 指定本地仓库路径
 
 在工程根目录下的 build.gradle 中，添加 flatDir，指定本地仓库路径。
-
 ![](https://main.qcloudimg.com/raw/9d365fabfe1c752e46d6d57f74bb5a03.jpg)
 
 #### 4.  添加 SDK 依赖
@@ -61,7 +54,9 @@ dependencies {
 ```java
 dependencies {
     implementation (name: "TEduBoardSdk-release", ext: "aar")
-    implementation (name: "imsdk-4.6.1", ext: "aar")
+    implementation (name: "imsdk-plus-6.6.3002", ext: "aar") // IM的版本请尽量用新版本，具体请查阅IM的更新日志 https://cloud.tencent.com/document/product/269/1606
+    implementation 'com.tencent.edu:TIWLogger:1.0.1.76'
+    implementation 'com.tencent.edu:TIWCache:1.0.0.91'
 }
 ```
 
@@ -69,8 +64,7 @@ dependencies {
 
 #### 5. 同步 SDK
 
-单击 Sync Now 按钮，完成 TEduBoard SDK 集成。
-
+单击 Sync Now，完成 TEduBoard SDK 集成。
 
 ## 配置 App 权限
 
@@ -84,18 +78,9 @@ dependencies {
 
 
 
-
 ## 使用 TEduBoard SDK
 
-#### 1. `#import` SDK
-
-在项目需要使用 SDK API 的文件里，引入具体的头文件
-
-```objc
-#import <TEduBoard/TEduBoard.h>
-```
-
-#### 2. 创建白板控制器
+#### 1. 创建白板控制器
 
 使用如下代码创建并初始化白板控制器：
 
@@ -107,15 +92,47 @@ TEduBoardController.TEduBoardAuthParam authParam = new TEduBoardController.TEduB
 //（2）白板默认配置
 TEduBoardController.TEduBoardInitParam initParam = new TEduBoardController.TEduBoardInitParam(); 
 mBoard = new TEduBoardController(context);
-mBoard.init(authParam, classId, initParam);
-//（3）添加白板事件回调
+
+//（3）添加白板事件回调 实现TEduBoardCallback接口  
+TEduBoardCallback callback = new TEduBoardController.TEduBoardCallback();
 mBoard.addCallback(callback);
+
+//（4）进行初始化
+mBoard.init(authParam, classId, initParam);
+
 ```
 
 其中 `sdkAppId`、`userId`、`userSig`、`classId`为需要您自己填写的参数。
 
+>!请在主进程中执行初始化操作，如果您的 App 使用了多进程，请注意注意避免重复初始化。
+
+#### 2. 监听白板关键事件  
+
+在 白板事件回调接口 `TEduBoardCallback`的`onTEBError`和`onTEBWarning` 回调方法内监听白板事件
+
+- [onTEBError 错误详情](https://cloud.tencent.com/document/product/1137/39970#teduboardcontroller.teduboarderrorcode)
+- [onTEBWarning 警告详情](https://cloud.tencent.com/document/product/1137/39970#teduboardcontroller.teduboardwarningcode)
+
+```java  
+/**
+  * 白板错误回调
+  * 必须要监听的事件
+  *
+  * @param code 错误码
+  * @param msg  错误信息，编码格式为 UTF8
+  */
+void onTEBError(int code, String msg);  
+
+/**
+  * 白板警告回调
+  * @param code 警告码
+  * @param msg  警告信息，编码格式为 UTF8
+  */
+void onTEBWarning(int code, String msg);
+```
+
 #### 3. 白板窗口获取及显示
-在 `onTEBInit`  回调方法内，使用如下代码获取并显示白板视图：
+在 onTEBInit 回调方法内，使用如下代码获取并显示白板视图：
 
 ```java
 // （1）在 Activity 的布局 xml 文件中，用 FrameLayout 占位，将来放 board 的 View。
@@ -138,37 +155,134 @@ SDK 所有回调都在主线程内执行，因此可以在回调里直接执行 
 
 #### 4. 白板数据同步
 
-白板在使用过程中，需要在不同的用户之间进行数据同步（涂鸦数据等），SDK 支持两种不同的数据同步模式。
+白板在使用过程中，需要在不同的用户之间进行数据同步（涂鸦数据等），SDK 默认使用 IMSDK 作为信令通道，您需要自行实现 IMSDK 的初始化、登录、加入群组操作，确保白板初始化时，IMSDK 已处于所指定的群组内。
 
-**使用腾讯云 IMSDK 同步数据**
-
-如果您在使用白板的同时使用了腾讯云 IMSDK，则只需要在初始化白板控制器时进行指定 initParam 参数的 timSync 字段为 true 即可实现数据同步。
-```java
-// 使用腾讯的 IM 进行消息传递，前提是您的项目中已经集成 TIM。
-// TEduBoardInitParam 的 timSync 的默认值为 true
-TEduBoardController.TEduBoardInitParam initParam = new TEduBoardController.TEduBoardInitParam(); 
-initParam.timSync = true;
-```
-
->! 您需要自行实现 IMSDK 的登录、加入群组等操作，确保白板初始化时，IMSDK 已处于所指定的群组内。
-
-**使用自定义的数据通道同步数据**
-
-如果使用自已的通道进行消息传递，则需要按下面步骤进行：
+步骤1：初始化 IMSDK
 
 ```java
-//（1）将 TEduBoardInitParam 的 timSync 参数初始为 NO
-TEduBoardController.TEduBoardInitParam initParam = new TEduBoardController.TEduBoardInitParam(); 
-initParam.timSync = false;
 
-//（2）TEduBoard 有数据要同步给其他用户时，将调用 TEduBoardDelegate 接口中的 onTEBSyncData 函数
- @Override
- public void onTEBSyncData(String data) {
-   // 使用自定义的通道，发送 data 数据给其他白板用户。
- }
+V2TIMSDKConfig timSdkConfig = new V2TIMSDKConfig();
+boolean result = V2TIMManager.getInstance().initSDK(context, sdkAppID, timSdkConfig);
 
-//（3）在收到其他用户的信息时，将消息传递给 TEduBoard.
-mBoard.addSyncData(data);
 ```
 
->! 实时录制功能在自定义数据通道模式下不可用
+如果您有其他业务使用了 IMSDK 并期望 IMSDK 的生命周期与 App 的生命周期保持一致，请在 Application 的 onCreate 方法中初始化 IMSDK，否则请在登录前初始化 IMSDK，在登出后反初始化 IMSDK 。
+
+步骤2：登录 IMSDK
+
+```java
+TIMGroupManager.getInstance().login(userId, userSig, new TIMCallBack() {
+      @Override
+      public void onSuccess(String s) {
+        
+      }
+
+      @Override
+      public void onError(int errCode, String errMsg) {
+        // 创建 IM 群组失败        
+});
+
+V2TIMManager.getInstance().login(userId, userSig, new V2TIMCallback() {
+    @Override
+    public void onSuccess() {
+      // 登录成功
+    }
+
+    @Override
+    public void onError(int errCode, String errMsg) {
+      // 登录失败
+    }
+});
+
+```
+
+步骤3：加入群组
+
+登录 IMSDK 成功后加入白板所在的群组。
+
+```java
+V2TIMManager.getInstance().joinGroup(classId, "board group" + classId, new V2TIMCallback() {
+    @Override
+    public void onSuccess() {
+      // 加群成功
+    }
+
+    @Override
+    public void onError(int i, String s) {
+      // 加群失败
+    }
+});
+```
+
+如果 IM 群组不存在，请先创建群组。
+
+```java
+V2TIMManager.getGroupManager().createGroup(groupInfo, null, new V2TIMValueCallback<String>() {
+    @Override
+    public void onError(int errCode, String errMsg) {
+        
+    }
+
+    @Override
+    public void onSuccess(String s) {
+        
+    }
+});
+```
+
+>!1. 推荐业务后台使用 [IM REST API](https://cloud.tencent.com/document/product/269/1615) 提前创建群组。<br>2. 不同的群组类型，群组功能以及成员数量有所区别，具体请查看 [IM 群组系统](https://cloud.tencent.com/document/product/269/1502)。
+
+
+#### 5. 销毁白板
+
+调用 unInit 方法后，内部将彻底销毁白板并停止计费，请您确保此接口的调用。
+
+```java
+mBoard.uninit();
+```
+
+如果您使用 IMSDK 作为信令通道，请根据业务的需要决定是否退出群组、退出登录并反初始化。
+
+步骤1：退出群组
+
+```java
+V2TIMManager.getInstance().quitGroup(classId, new V2TIMCallback() {
+  @Override
+  public void onSuccess() {
+      
+  }
+
+  @Override
+  public void onError(int i, String s) {
+      
+  }
+});
+```
+
+步骤2：登出 IMSDK
+
+```java
+// IM登出
+public void logout(final IMCallBack callBack) {
+    V2TIMManager.getInstance().logout(new V2TIMCallback(){
+        @Override
+        public void onSuccess() {
+            
+        }
+
+        @Override
+        public void onError(int errCode, String errMsg) {
+            
+        }
+    });
+}
+```
+
+步骤3：反初始化 IMSDK
+
+```java
+V2TIMManager.getInstance().unInitSDK();
+```
+
+如果您有其他业务使用了 IMSDK 并期望 IMSDK 的生命周期与 App 的生命周期保持一致，无需调用此接口。
+

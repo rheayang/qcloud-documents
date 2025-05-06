@@ -1,49 +1,53 @@
+<style> 
+table th:nth-of-type(1) { width:18%; } 
+table th:nth-of-type(2){ width:82%; } 
+</style>
+
 本文详细描述了通过 CDN 加速 COS 的整体操作流程和具体的操作方法。
 
 ## 前提条件
+
 1. 完成腾讯云账号注册、实名认证。
 2. 创建 COS 存储桶，详情请参见 [创建存储桶](https://cloud.tencent.com/document/product/436/13309)。
 
 ## 操作指南
+
 ### 添加域名
-登录 [CDN 控制台](https://console.cloud.tencent.com/cdn)，在左侧导航栏中，单击【域名管理】进入域名管理页面，单击【添加域名】。
- ![](https://main.qcloudimg.com/raw/0fbebd8e30610d3e8607a60851946c42.png)
+
+登录 [CDN 控制台](https://console.cloud.tencent.com/cdn)，在左侧导航栏中，单击**域名管理**进入域名管理页面，单击**添加域名**。 ![img](https://main.qcloudimg.com/raw/3d2e458b232cdc89fafb546045a92bc1.png)
 
 ### 选择 COS 作为源站
-![](https://main.qcloudimg.com/raw/770beaa32f0bc60a90634e1bcaafc535.png)
-1. 输入需要加速的**域名**。
-支持泛域名接入，如：*.test.com。支持域名批量接入，最多可添加10个域名。
-域名需要满足以下条件：
- - 域名已经在工信部进行过备案
- - 域名尚未被接入过腾讯云 CDN
-2. 选择域名的**所属项目**。
-此处的项目为腾讯云所有产品共享，您可以在 [项目管理](https://console.cloud.tencent.com/project) 中添加项目。
-3. 在**域名配置**中的**源站类型**中选择：对象存储（COS）。
-4. 选择对应的**存储桶**的域名。
-5. 开启**私有存储桶访问**，需先对 CDN 服务授权。确认授权后可手动开启。
 
->!
-> - 从 CDN 接入 COS 源域名时，已全面切换为 COSV5 版本，若您需要添加 COSV4 的 bucket 作为源站，需要前往 COSV4 控制台，对相应 bucket 开启加速服务。
-> - 若您的 COSV5 bucket 为私有，需要先允许您的 CDN 服务访问对应 COS bucket，而后开启回源访问，此时所有私有 bucket 中的资源均可通过 CDN 公网分发，具有较高安全风险，请谨慎操作。
+#### 第一部分：域名配置
 
-### 加速服务配置
-根据您的业务需求选择**业务类型**、**基本配置**和**缓存过期配置**。
-![](https://main.qcloudimg.com/raw/de79b81e27ac57e11c24ddf13c172abd.png)
-1. **业务类型**
-   业务类型选择决定了域名调度的资源平台，不同资源平台加速配置存在一定差异，请选择与您业务相匹配的业务类型：
-   - 静态加速：适用于电商类、网站类、游戏图片类静态资源加速场景。
-   - 下载加速：适用于游戏安装包、音视频原文件下载、手机固件分发等场景。
-   - 流媒体点播加速：适用于音视频点播加速等场景。
+在域名处填充您需要加速的区域，自身的服务域名，为其选择项目、加速类型、是否开启 IPv6 访问和标签：
+<img src="https://main.qcloudimg.com/raw/1d61e97e96d35779b33b00122aa1b5e8.png" width="60%">
 
-2. **基本配置**
-CDN 为您提供了过滤参数开关，您可以根据业务需要，控制是否对用户请求 URL 中 **“?”** 之后的参数进行过滤。您可以利用过滤参数灵活的进行版本控制，或对资源进行带有 Token 的鉴权。详情请参见 [过滤参数配置](https://cloud.tencent.com/doc/product/228/6291)。
+#### 第二部分：源站配置
 
-3. **缓存过期配置**
-缓存过期配置是指 CDN 加速节点在缓存您的业务内容时遵循的一套过期规则。详情请参见 [缓存过期配置](https://cloud.tencent.com/doc/product/228/6290)。
+配置业务源站相关信息，CDN 节点在缓存无资源时，会回源站拉取并缓存：
+<img src="https://qcloudimg.tencent-cloud.cn/raw/0851c32e32ed6133ba9b096174db4042.png" width="60%">
 
 
-### 接入完成
-输入**添加域名**页面所有配置后，单击【提交】完成添加域名操作，请耐心等待域名配置下发至全网节点，下发时间约5 - 10分钟。
+1. 在**域名配置**中的**源站类型**中选择：COS 源（即对象存储）。
+2. 根据源站支持情况，选择回源请求协议。
+3. 在源站地址中选择对应的**存储桶**。
+4. 开启**私有存储桶访问**，需前往 COS-bucket 权限管理先对 CDN 服务授权。确认授权后可手动开启。
+5. 回源 HOST 默认，无需修改。
 
-### 配置CNAME
-添加域名成功后，在**域名管理**页面，可以查看到 CDN 为您的域名分配的加速 CNAME，您需要前往接入域名的 DNS 服务商（如 Dnspod）处，为此域名添加一条 CNAME 记录，待 **DNS 配置生效后**，即可进行加速服务。详情请参见 [CNAME 配置](https://cloud.tencent.com/doc/product/228/3121)。
+
+
+输入**添加域名**页面所有配置后，单击**确认添加**完成添加域名操作，请耐心等待域名配置下发至全网节点，下发时间约5 - 10分钟。
+
+### 最后一步：配置 CNAME
+
+添加域名成功后，在**域名管理**页面，可以查看到 CDN 为您的域名分配的加速 CNAME。
+![](https://main.qcloudimg.com/raw/f588a7ee5d9497b355f3492b0016c350.png)
+
+您需要前往接入域名的 DNS 服务商（如 Dnspod）处，为此域名添加上该 CNAME 记录，待 **DNS 配置生效后**，即可进行加速服务。详情请参见 [CNAME 配置](https://cloud.tencent.com/doc/product/228/3121)。
+
+## 建议配置
+
+1. 配置完成后，为 COS 下的资源文件做好预热。提前将静态资源预热至 CDN 加速节点，降低源站压力，提高响应与下载速度。详情可见 <a href="https://cloud.tencent.com/document/product/228/40273"> 缓存预热</a>。
+2. 配置好跨域的头部参数。解决资源的跨域权限问题，详情可见 <a href="https://cloud.tencent.com/document/product/228/41737#.E5.A4.B4.E9.83.A8.E5.8F.82.E6.95.B0">HTTP 响应头配置</a>。
+3. 若客户源站的资源已修改，建议刷新缓存后再重新进行预热。详情可见 <a href="https://cloud.tencent.com/document/product/228/6299">缓存刷新</a>。

@@ -1,6 +1,9 @@
 
 
+
+
 对设备端 SDK 的使用分以下两种情况：   
+
 - 若 App 与 IoT-SDK 在同一进程中运行，则 App 只需依赖 iot_core 模块即可。
 - 若 App 与 IoT-SDK 需运行在不同进程，则 App 只需依赖 iot_service 模块即可。
 
@@ -35,7 +38,7 @@
 | ---------------------------- | -----------------------------------|
 | connect                      |  网关 连接                          |
 | reconnect                    |  网关 重连                          |
-| disConnect                   |  断开 网关MQTT连接                       |
+| disConnect                   |  断开 网关 MQTT 连接                       |
 | publish                      |  发布 MQTT 消息                      |
 | subscribe                    |  订阅 MQTT 主题                      |
 | unSubscribe                  |  取消订阅 MQTT 主题                   |
